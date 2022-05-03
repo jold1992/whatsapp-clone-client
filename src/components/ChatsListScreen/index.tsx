@@ -1,6 +1,7 @@
-import React from 'react'
-import { ChatsList } from './ChatsList'
-import { ChatsNavbar } from './ChatsNavbar'
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { ChatsList } from './ChatsList';
+import { ChatsNavbar } from './ChatsNavbar';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -8,10 +9,13 @@ const Container = styled.div`
 `;
 
 export const ChatsListScreen = () => {
-    return (
-        <Container>
-            <ChatsNavbar />
-            <ChatsList />
-        </Container>
-    )
-}
+
+  const {history} = useParams();
+
+  return (
+    <Container>
+      <ChatsNavbar />
+      <ChatsList history={history} />
+    </Container>
+  );
+};

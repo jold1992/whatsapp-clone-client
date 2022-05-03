@@ -1,7 +1,9 @@
-import { useState, useMemo } from 'react';
-import moment from 'moment'
+import { useCallback, useState, useMemo } from 'react';
+import { History } from 'history';
+import moment from 'moment';
 import { List, ListItem } from '@material-ui/core';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   height: calc(100% - 56px);
@@ -55,6 +57,12 @@ const MessageDate = styled.div`
   font-size: 13px;
 `;
 
+interface ChatsListProps {
+  location: {
+    pathname: string;
+  };
+}
+
 const getChatsQuery = `
   query GetChats {
     chats {
@@ -70,45 +78,67 @@ const getChatsQuery = `
   }
 `;
 
-export const ChatsList = () => {
-    const [chats, setChats] = useState<any[]>([]);
+export const ChatsList:React.FC<ChatsListProps> = ({location}) => {
+  const [chats, setChats] = useState<any[]>([]);
 
-    useMemo(async () => {
-        const body = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ query: getChatsQuery }),
-        });
-        const {
-            data: { chats },
-        } = await body.json();
-        setChats(chats);
-    }, []);
+  let navigate = useNavigate();  
 
-    return (
-        <Container>
-            <StyledList>
-                {chats.map((chat) => {
-                    console.log(chat);
 
-                    return <StyledListItem key={chat!.id} button>
-                        <ChatPicture src={chat.picture} alt="Profile" />
-                        <ChatInfo>
-                            <ChatName>{chat.name}</ChatName>
-                            {chat.lastMessage && (
-                                <>
-                                    <MessageContent>{chat.lastMessage.content}</MessageContent>
-                                    <MessageDate>
-                                        {moment(chat.lastMessage.createdAt).format('HH:mm')}
-                                    </MessageDate>
-                                </>
-                            )}
-                        </ChatInfo>
-                    </StyledListItem>
-                })}
-            </StyledList>
-        </Container>
-    );
+  const navToChat = useCallback(
+    (chat: { id: any; }) => {
+      navigate(`chats/${chat.id}`);
+    },
+    [location]
+  );
+
+  useMemo(async () => {
+    try {
+      const body = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: getChatsQuery }),
+      });
+      const {
+        data: { chats },
+      } = await body.json();
+      setChats(chats);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  return (
+    <Container>
+      <StyledList>
+        {chats.map((chat) => (
+          <StyledListItem
+            key={chat.id}
+            data-testid="chat"
+            button
+            onClick={navToChat.bind(null, chat)}>
+            <ChatPicture
+              data-testid="picture"
+              src={chat.picture}
+              alt="Profile"
+            />
+            <ChatInfo>
+              <ChatName data-testid="name">{chat.name}</ChatName>
+              {chat.lastMessage && (
+                <>
+                  <MessageContent data-testid="content">
+                    {chat.lastMessage.content}
+                  </MessageContent>
+                  <MessageDate data-testid="date">
+                    {moment(chat.lastMessage.createdAt).format('HH:mm')}
+                  </MessageDate>
+                </>
+              )}
+            </ChatInfo>
+          </StyledListItem>
+        ))}
+      </StyledList>
+    </Container>
+  );
 };
