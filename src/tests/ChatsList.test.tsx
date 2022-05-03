@@ -1,12 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import { cleanup, fireEvent, render, waitFor, screen } from '@testing-library/react';
 import { ChatsList } from '../components/ChatsListScreen/ChatsList';
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, BrowserRouter, Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 
 describe('ChatsList', () => {
- 
+
   afterEach(() => {
     cleanup();
     //delete window.location;
@@ -39,16 +38,18 @@ describe('ChatsList', () => {
         },
       })
     );
- 
-    {              
+
+    {
       const { container, getByTestId } = render(
-        <ChatsList location={{'pathname': '/chats'}} />
+        <BrowserRouter>
+          <ChatsList />
+        </BrowserRouter>
       );
 
       //console.log(screen.getByTestId('name'))
- 
+
       await waitFor(() => screen.getByTestId('name'));
- 
+
       expect(getByTestId('name')).toHaveTextContent('Foo Bar');
       expect(getByTestId('picture')).toHaveAttribute(
         'src',
@@ -77,23 +78,22 @@ describe('ChatsList', () => {
           ],
         },
       })
-    );     
- 
+    );
+
     {
-
-      const {pathname} = useLocation();
-      console.log(pathname);
-
+      const history = createMemoryHistory();
       const { container, getByTestId } = render(
-        <ChatsList location={{pathname}} />
-      );      
- 
-      await waitFor(() => screen.getByTestId('chat'));
- 
+        <Router navigator={history} location={"/"}>
+          <ChatsList />
+        </Router>
+      );
+
+      await waitFor(() => screen.findByTestId('chat'));
+
       fireEvent.click(getByTestId('chat'));
- 
+
       await waitFor(() =>
-        expect(pathname).toEqual('/chats/1')
+        expect(history.location.pathname).toEqual('/chats/1')
       );
     }
   });

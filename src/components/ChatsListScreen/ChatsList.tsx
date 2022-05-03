@@ -1,5 +1,4 @@
 import { useCallback, useState, useMemo } from 'react';
-import { History } from 'history';
 import moment from 'moment';
 import { List, ListItem } from '@material-ui/core';
 import styled from 'styled-components';
@@ -57,11 +56,11 @@ const MessageDate = styled.div`
   font-size: 13px;
 `;
 
-interface ChatsListProps {
-  location: {
-    pathname: string;
-  };
-}
+// interface ChatsListProps {
+//   location: {
+//     pathname: string;
+//   };
+// }
 
 const getChatsQuery = `
   query GetChats {
@@ -78,17 +77,17 @@ const getChatsQuery = `
   }
 `;
 
-export const ChatsList:React.FC<ChatsListProps> = ({location}) => {
+export const ChatsList = () => {
   const [chats, setChats] = useState<any[]>([]);
 
-  let navigate = useNavigate();  
-
+  let navigate = useNavigate();
 
   const navToChat = useCallback(
     (chat: { id: any; }) => {
-      navigate(`chats/${chat.id}`);
+      console.log(chat);
+      navigate(`/chats/${chat.id}`);
     },
-    [location]
+    [navigate],
   );
 
   useMemo(async () => {
