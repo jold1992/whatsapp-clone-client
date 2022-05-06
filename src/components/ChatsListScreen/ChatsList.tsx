@@ -4,6 +4,8 @@ import { List, ListItem } from '@material-ui/core';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
+import { motion } from 'framer-motion'
+
 const Container = styled.div`
   height: calc(100% - 56px);
   overflow-y: overlay;
@@ -83,11 +85,11 @@ export const ChatsList = () => {
   let navigate = useNavigate();
 
   const navToChat = useCallback(
-    (chat: { id: any; }) => {
-      console.log(chat);
+    (chat: { id: any }) => {
+      //console.log(chat);
       navigate(`/chats/${chat.id}`);
     },
-    [navigate],
+    [navigate]
   );
 
   useMemo(async () => {
@@ -109,35 +111,40 @@ export const ChatsList = () => {
   }, []);
 
   return (
-    <Container>
-      <StyledList>
-        {chats.map((chat) => (
-          <StyledListItem
-            key={chat.id}
-            data-testid="chat"
-            button
-            onClick={navToChat.bind(null, chat)}>
-            <ChatPicture
-              data-testid="picture"
-              src={chat.picture}
-              alt="Profile"
-            />
-            <ChatInfo>
-              <ChatName data-testid="name">{chat.name}</ChatName>
-              {chat.lastMessage && (
-                <>
-                  <MessageContent data-testid="content">
-                    {chat.lastMessage.content}
-                  </MessageContent>
-                  <MessageDate data-testid="date">
-                    {moment(chat.lastMessage.createdAt).format('HH:mm')}
-                  </MessageDate>
-                </>
-              )}
-            </ChatInfo>
-          </StyledListItem>
-        ))}
-      </StyledList>
-    </Container>
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: "100%" }}
+      exit={{ width: window.innerWidth, transition: {duration: 0.1} }}>
+      <Container>
+        <StyledList>
+          {chats.map((chat) => (
+            <StyledListItem
+              key={chat.id}
+              data-testid="chat"
+              button
+              onClick={navToChat.bind(null, chat)}>
+              <ChatPicture
+                data-testid="picture"
+                src={chat.picture}
+                alt="Profile"
+              />
+              <ChatInfo>
+                <ChatName data-testid="name">{chat.name}</ChatName>
+                {chat.lastMessage && (
+                  <>
+                    <MessageContent data-testid="content">
+                      {chat.lastMessage.content}
+                    </MessageContent>
+                    <MessageDate data-testid="date">
+                      {moment(chat.lastMessage.createdAt).format('HH:mm')}
+                    </MessageDate>
+                  </>
+                )}
+              </ChatInfo>
+            </StyledListItem>
+          ))}
+        </StyledList>
+      </Container>
+    </motion.div>
   );
 };

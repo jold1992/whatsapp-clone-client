@@ -1,27 +1,15 @@
 import React from 'react';
 import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
+  BrowserRouter as Router,   
 } from "react-router-dom";
-
-import { ChatsListScreen } from './components/ChatsListScreen';
-import ChatRoomScreen from './components/ChatRoomScreen';
+import { AnimatedRoutes } from './components/CustomComponents/AnimatedRoutes';
 
 function App() {
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/chats" element={<ChatsListScreen />} />
-        <Route path="/chats/:chatId" element={<ChatRoomScreen />} />
-        <Route
-          path="*"
-          element={<Navigate to="/chats" replace />}
-        />
-      </Routes>
-    </BrowserRouter>
+    <Router>
+      <AnimatedRoutes />
+    </Router>
   );
 }
 
