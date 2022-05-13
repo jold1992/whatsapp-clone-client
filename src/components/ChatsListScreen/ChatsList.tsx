@@ -1,8 +1,9 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback } from 'react';
 import moment from 'moment';
 import { List, ListItem } from '@material-ui/core';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useChatsQuery } from '../../graphql/types';
 
 import { motion } from 'framer-motion'
 
@@ -58,30 +59,7 @@ const MessageDate = styled.div`
   font-size: 13px;
 `;
 
-// interface ChatsListProps {
-//   location: {
-//     pathname: string;
-//   };
-// }
-
-const getChatsQuery = `
-  query GetChats {
-    chats {
-      id
-      name
-      picture
-      lastMessage {
-        id
-        content
-        createdAt
-      }
-    }
-  }
-`;
-
 export const ChatsList = () => {
-  const [chats, setChats] = useState<any[]>([]);
-
   let navigate = useNavigate();
 
   const navToChat = useCallback(
@@ -92,32 +70,22 @@ export const ChatsList = () => {
     [navigate]
   );
 
-  useMemo(async () => {
-    try {
-      const body = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: getChatsQuery }),
-      });
-      const {
-        data: { chats },
-      } = await body.json();
-      setChats(chats);
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+  const { data } = useChatsQuery();
+
+  if (data === undefined || data.chats === undefined) {
+    return null;
+  }
+
+  let chats = data.chats;
 
   return (
     <motion.div
       initial={{ width: 0 }}
       animate={{ width: "100%" }}
-      exit={{ width: window.innerWidth, transition: {duration: 0.1} }}>
+      exit={{ width: window.innerWidth, transition: { duration: 0.3 } }}>
       <Container>
         <StyledList>
-          {chats.map((chat) => (
+          {chats.map((chat: any) => (
             <StyledListItem
               key={chat.id}
               data-testid="chat"

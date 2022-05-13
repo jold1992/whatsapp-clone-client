@@ -1,3 +1,5 @@
+/* eslint-disable testing-library/prefer-screen-queries */
+/* eslint-disable testing-library/prefer-find-by */
 import { cleanup, fireEvent, render, waitFor, screen } from '@testing-library/react';
 import { ChatsList } from '../components/ChatsListScreen/ChatsList';
 
@@ -19,7 +21,7 @@ describe('ChatsList', () => {
   });
 
   it('renders fetched chats data', async () => {
-    console.log('hello world');
+    //console.log('hello world');
     fetchMock.mockResponseOnce(
       JSON.stringify({
         data: {
